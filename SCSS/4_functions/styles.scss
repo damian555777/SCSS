@@ -1,0 +1,128 @@
+@import './variables.scss';
+
+@mixin grid-mixin {
+    display: -ms-grid;
+    display: grid;
+}
+
+@mixin  IE-grid-cols-mixin($cols: 3) {
+    @debug "creating col class: #{$cols} for grid-#{$cols}";
+    > *:nth-child(#{$cols}n) {
+        -ms-grid-column: $cols ;
+    }
+
+    @for $i from 1 to $cols {
+        @debug "creating col class: #{$i} for grid-#{$cols}";
+        > *:nth-child(#{$cols}n + #{$i}) {
+            -ms-grid-column: $i;
+        }
+    }
+}
+
+@mixin IE-grid-rows-mixin($cols: 3, $rows: 3) {
+    // any item less than the number of cols
+    @debug "creating row class: 1 for grid-#{$cols}";
+    > *:nth-child(n - #{$cols + 1}) {
+        -ms-grid-row: 1;
+    }
+
+    @for $i from 1 to $rows {
+        @debug "creating row class: #{($i + 1)} for grid-#{$cols}";
+        > *:nth-child(n + #{($cols + 1) + ($cols * ($i - 1))}) {
+            -ms-grid-row: $i + 1;
+        }
+    }
+}
+
+@mixin grid-cols-mixin($colDimensions: 1fr, $cols: 3, $rows: 3) {
+    @include grid-mixin;
+    -ms-grid-columns: $colDimensions;
+    grid-template-columns: $colDimensions;
+    @include IE-grid-cols-mixin($cols);
+    @include IE-grid-rows-mixin($cols, $rows);
+}
+
+@mixin full-height-mixin {
+    height: 100%;
+}
+
+@mixin full-width-mixin {
+    width: 100%;
+}
+
+@mixin full-mixin {
+    @include full-width-mixin;
+    @include full-height-mixin;
+}
+
+@mixin text-center-mixin {
+    text-align: center;
+}
+
+@mixin white-text-mixin {
+    color: $primary-font-color;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    height: 100vh;
+    width: 100vw;
+}
+
+.body-container {
+    @include full-mixin;
+    display: flex;
+    flex-direction: column;
+}
+
+.header-container {
+    @include full-width-mixin;
+    @include text-center-mixin;
+    @include white-text-mixin;
+    background-color: $primary-background-color;
+}
+
+.content-container {
+    display: flex;
+    flex: 1;
+}
+
+.left-container {
+    flex: 1;
+    padding-left: $padding-size;
+    background-color: $secondary-background-color;
+    color: $secondary-font-color;
+    ul {
+        list-style-type: none;
+        li {
+            margin-bottom: $margin-size;
+        }
+    }
+}
+
+.right-container {
+    @include text-center-mixin;
+    overflow: auto;
+    flex: 3;
+}
+
+.main-container {
+    text-align: left;
+    p {
+        padding: $padding-size;
+    }
+    p:nth-child(3n + 2) {
+        padding: $padding-size 0;
+    }
+}
+
+.grid-3-col {
+    @include grid-cols-mixin(1fr 1fr 1fr, 3, 34);
+}
+
+.footer-container {
+    @include text-center-mixin;
+    @include white-text-mixin;
+    background-color: $tertiary-background-color;
+}

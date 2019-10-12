@@ -1,0 +1,31 @@
+.grid-container {
+	display: grid;
+	grid-template-columns: 1fr 1fr 1fr;
+	/* IE grid support */
+	display: -ms-grid;
+	-ms-grid-columns: 1fr 1fr 1fr; /* cannot utilize the repeat function */
+}
+
+.grid-container > li:nth-child(3n + 1) {
+	-ms-grid-column: 1;
+}
+
+.grid-container > li:nth-child(3n + 2) {
+	-ms-grid-column: 2;
+}
+
+.grid-container > li:nth-child(3n) {
+	-ms-grid-column: 3;
+}
+
+.grid-container > li:nth-child(n - 4) {
+	-ms-grid-row: 1;
+}
+
+.grid-container > li:nth-child(n + 4) {
+	-ms-grid-row: 2;
+}
+
+.grid-container > li:nth-child(n + 7) {
+	-ms-grid-row: 3;
+}

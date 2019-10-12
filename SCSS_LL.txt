@@ -1,0 +1,475 @@
+Topic:
+- SCSS/SASS
+
+Length:
+- 1 hour
+
+Presenter:
+- Daniel McCarthy
+
+Script:
+
+=======================================================================================
+CSS pitfalls
+=======================================================================================
+
+Alright, let's go ahead and try to learn some SCSS.
+
+As some of you know, though I can safely assume most of you don't, Jamie, CSS is a stylesheet language used to shape the way your webpage looks and feels, hopefully for the better!
+
+CSS was initally release back in 1996 and now we're on CSS 3.
+
+There is certainly nothing wrong with vanilla CSS, it just has some pitfalls, namely regarding logic, it has none.
+
+CSS does contain certain selectors to mitigate this issue such as :nth-child(n).
+
+Let's take a look at a complicated problem.
+
+The CSS grid style is a way of creating a container that can responsively create a... grid layout.
+
+I know that's anticlimatic but the name is pretty accurate.
+
+In modern browsers (Chrome, Firefox, Safari), it works extremely well.
+
+Let's take a look at this list of 9 items.
+
+*Show css_0.html*
+
+Say we wanted a grid with 3 columns and N rows, the container would need a style of:
+.grid-container {
+	display: grid;
+	grid-template-columns: repeat(3, 1fr);
+}
+
+*Show css_1.html*
+
+Easy enough right?
+
+Now let's talk about our good old friend IE, and hopefully thats IE11.
+
+IE is not a modern browser and therefore does not support all of our new and shiny toys.
+
+To get it to accept the grid styling we would need to enhance our class and create additional styles:
+.grid-container {	
+	/* IE grid support */
+	display: -ms-grid;
+	-ms-grid-columns: 1fr 1fr 1fr; /* cannot utilize the repeat function */
+	display: grid;
+	grid-template-columns: repeat(3, 1fr);
+}
+
+IE only accepts the display of -ms-grid and we must specify the -ms-grid-columns.
+
+Note that we cannot use the repeat function if we intend to support IE, as of course, it's not supported.
+
+All set, right?
+
+*Show css_2.html*
+
+Just kidding, we need to account for just how stupid IE is.
+
+IE expects us to assign every child element to it's position in the grid, so let's do the columns first.
+
+CSS allows us to use the :nth-child selector to convieniently place our items into our 3 columns:
+.grid-container > li:nth-child(3n + 1) {
+	-ms-grid-column: 1;
+}
+
+.grid-container > li:nth-child(3n + 2) {
+	-ms-grid-column: 2;
+}
+
+.grid-container > li:nth-child(3n) {
+	-ms-grid-column: 3;
+}
+
+In this case, "3n" means every third element (3, 6, 9), "3n + 1" means every third element plus 1 (1, 4, 7) and "3n + 2" means every third element plus 2 (2, 5, 8).
+
+It's also worth noting that HTML seems to start indexing at 1, so there isn't technically a 0th element for these selectors.
+
+Let's take a look.
+
+*Show css_3.html*
+
+Getting closer, now we must assign rows.
+
+Logically, we would want the first 3 in the first row, the next 3 in the second row and the last 3 in the third row.
+
+With the same CSS selector but different logic, we can assign the rows like so:
+.grid-container > li:nth-child(n - 4) {
+	-ms-grid-row: 1;
+}
+
+.grid-container > li:nth-child(n + 4) {
+	-ms-grid-row: 2;
+}
+
+.grid-container > li:nth-child(n + 7) {
+	-ms-grid-row: 3;
+}
+
+In this case, "n - 4" means every element less than 4, "n + 4" means every element 4 or greater and "n + 7" means every element 7 or greater.
+
+*Show css_4.html*
+
+We've now made our webpage compatible with IE! Or have we?
+
+What happens if this is a dynamic list and more rows of items get added?
+
+*Show css_5.html*
+
+Unfortunately, IE is now placing all items greater than 6 into that final row, as we specified it to.
+
+This means that it would be rather challenging to create all of the CSS styles to support an infinite list, if it's actually even possible.
+
+Though we can't fix IE's ineptitude, we can clean up our stylesheet using SCSS.
+
+=======================================================================================
+
+
+
+=======================================================================================
+SCSS, what is it?
+=======================================================================================
+
+Before we jump into rewriting the previous example in SCSS, let's have a brief overview what that exactly is.
+
+The year is 2006 and already people are getting lazy about their CSS, much like this script.
+
+While everyone appreciates CSS, they wish it had a cooler anagram.
+
+This is what gave birth to SASS, or "syntactically awesome style sheets".
+
+SASS was developed to address a growing problem, pun intended.
+
+Stylesheets where (and still are) becoming more and more complex and lengthy, making them harder to maintain.
+
+SASS implemented ways to mitigate this: mixins, nested selectors, variables, inheritance and functions.
+
+The language can be seen as an extension to CSS.
+
+The features I just meantioned belong to SASS, but they must be broken down by a preprocessor back into good ole CSS.
+
+Take note of this as SASS is not meant to somehow inject dynamic styling into your webapp, it just allows you to write and manage your CSS easier.
+
+SASS was nearly the golden standard, nearly.
+
+Old habits die hard and SASS tried to teach too new of a trick some old dogs.
+
+The SASS files utilized a syntax call "the indented syntax", similar to Haml (same developer invented both!).
+
+Essentially, each line of SASS looked like CSS minus semicolons and brackets.
+
+This confused people and additionally had a major hitch: What if people wanted to port over their old CSS?
+
+In that case, they would have to translate the CSS to SASS.
+
+Thus SCSS was born, the best of both worlds!
+
+Sometimes refered to as sassy CSS, SCSS has all the features of SASS but in the syntax of CSS (where applicable).
+
+This makes it a direct extension of CSS, so all valid CSS is valid SCSS!
+
+Now, lets go ahead and start taking a look into the main features of SCSS.
+
+=======================================================================================
+
+
+
+=======================================================================================
+Mixins
+=======================================================================================
+
+We'll go ahead and start with mixins.
+
+I've gone ahead and created a very simple webapp layout for demostration purposes, please ignore any ugly coloring or dumb examples.
+
+*show Start.html *
+
+So, we can see we've got a header, a left panel, some main content and a footer.
+
+Without any CSS or SCSS it's a very ugly page, as expected.
+
+Now, let's go ahead and add some SCSS.
+
+*show Mixins.html*
+
+Much better!
+
+We've created a simple layout for the page using SCSS which has been processed down into CSS.
+
+The current SCSS is only utilizing the mixins feature though we will continue to add more SCSS features in a moment.
+
+Now lets see what the SCSS looks like.
+
+*show styles.scss, focus on the full-mixin mixin*
+
+At the top of the file is where the mixins should be declared, though you can declare them wherever you want.
+
+They are prefaced with the @mixin annotation and then the name of the mixin is given.
+
+At that point, you would declare any CSS styles that you would normally place into a class.
+
+So, the mixin has been declared, let's use it!
+
+All you have to do is create a class and inside of the class use the @include annotation and give the name of your mixin.
+
+Done and dusted, the SCSS will now generate the following CSS
+
+*show the CSS, focus on the .body-container class*
+
+Note the lack of mixins in the generated CSS, they are essentially just shorthand for styles in SCSS which will be broken back into CSS after processing.
+
+Mixins can also include other mixins and accept parameters!
+
+*show the grid-cols-mixin mixin*
+
+Here we can see that we include the grid mixin we just declared.
+
+We are also accepting a parameter that has a default specified.
+
+When including this mixin, you can choose not to provide a parameter and it would use the default value, duh.
+
+*show the SCSS, focus on the .main-container class*
+
+Otherwise, you can specify the number of columns in the grid layout in this case.
+
+The generated CSS from this mixin will look like the following:
+
+*show the CSS, focus on the .main-container class*
+
+Note that this class didn't directly include the grid-mixin yet the generated CSS does since the mixin it did include used the grid-mixin.
+
+Here's how you should consider mixins:
+
+Mixins should be used to make you CSS more readable, to remove complexity and to remove redundant styles.
+
+In the SCSS I created, you'll note that every mixin I made is either being used at least twice or will likely be used in the future.
+
+Also note that even though some styles are used twice or more, they don't have a mixin created for them.
+
+In these cases, the mixin would just take longer to declare and use than the raw CSS style itself, you would gain nothing.
+
+Only create a mixin when there is a current or near future need to include the mixin in multiple classes.
+
+The hope is that in the long run you will be declaring far fewer CSS styles and using more predefined mixins to clean up your SCSS files.
+
+=======================================================================================
+
+
+
+=======================================================================================
+Nested
+=======================================================================================
+
+Now let's move onto nested SCSS selectors.
+
+*show Nested.html*
+
+Only some minor changes this time around.
+
+You'll note that the Left Panel's list no longer has bullets and the items now have spacing between them.
+
+Let's take a look at their SCSS.
+
+*show styles.scss, focus on the .left-container class*
+
+Inside of the .left-container class, we now have an additional selector of ul.
+
+This is the unordered list of items and we have removed any list styling which are the bullets.
+
+Inside of that ul, we've also selected every list item and added some margin to the bottom.
+
+The CSS that gets generated looks like the following:
+
+*show styles.css, focus on the .left-container class selectors*
+
+The processed CSS actually takes the nested selectors and breaks them back down into specific selectors in order to apply the SCSS.
+
+Take note of the direct child selector's use.
+
+You'll want to mostly use specific class selectors as otherwise you might end up affecting child elements downstream if you're not careful.
+
+Let's take a look at some more complicated nested SCSS.
+
+*show styles.scss, focus on the .main-container class*
+
+Here we are saying that every paragraph inside of the .main-container class will have padding on all sides.
+
+We can then say that every paragraph at an odd index will be have it's text be blue.
+
+This just shows that you can use CSS psuedo classes inside of nested SCSS selectors.
+
+Finally, we want even spacing between all of our child paragraphs.
+
+The first nested SCSS paragragh styling will actually double up the padding on paragraphs in the middle column.
+
+So, the final SCSS nested selector will only apply padding to the top and bottom of paragraphs in the middle column, allowing the left and right coluns to handle the left and right spacing.
+
+Nested selectors have a caveat, however.
+
+You must not used nested selectors past three layers deep.
+
+Doing so tightly couples your nested styles to your HTML and makes overriding styles later on much more difficult.
+
+We encounter this issue quite often when trying to modify PrimeFaces SCSS and it unfortunately makes SCSS rather hard to maintain.
+
+Nested selectors are also not reusabled, creating redundant code.
+
+Just be aware of what you're trying to accomplish and that nested selectors are the best solution for solving the problem.
+
+=======================================================================================
+
+
+
+=======================================================================================
+Variables
+=======================================================================================
+
+Time for SCSS variables!
+
+*show variables.html*
+
+Not very apparent immediately, right?
+
+This feature is much more impactful in the maintainance of SCSS.
+
+*show variables.scss*
+
+Here we can see that I have converted all colors of the webapp to variables and I have declared some margin and padding variables.
+
+Usually, you should manage your variables in a separate SCSS file, it just allows for easier maintainance.
+
+You can even break down these variables into seperate files based what they affect (font size vs colors).
+
+Variables are declared by perfixing a variable name with the $ symbol.
+
+SCSS variables can also refer to other SCSS variables which will allow for quick app wide changes.
+
+Variables must somehow be imported into whatever SCSS files needs to reference them or declared directly in that SCSS file.
+
+*show styles.scss*
+
+In my case, I've imported the variables.scss file.
+
+To use a variable, you simply call the prefixed name.
+
+The glory of variables is how fast they enable app wide changes.
+
+*switch the colors in the variables.scss and recompile*
+
+Not pretty but it proves the point!
+
+=======================================================================================
+
+
+
+=======================================================================================
+Inheritance
+=======================================================================================
+
+It's been too calm so here's some opionated controversy regarding SCSS:
+
+Inheritance in SCSS was a good idea but ultimately poorly implemented.
+
+There is a directive in SCSS called @extend which allows you to extend classes from within other classes.
+
+You might think this is similar to using mixins but the generated CSS looks very different.
+
+It's unintuitive and potentially dangerous as it can either tightly couple your SCSS to your HTML or it can create very weak selectors.
+
+These are rather different issues but introduced by the same directive if used improperly, which is common.
+
+Additionally, that fact that mixins exist and handle redundant styles properly invalidates most uses of the @extend directive.
+
+Believing that ignorance is bliss, I will not be showing an example of this and hope that you'll trust me when I say not to use the @extend directive for the reasons I've already mentioned.
+
+=======================================================================================
+
+
+
+=======================================================================================
+Functions
+=======================================================================================
+
+It's time to get back to our original issue, and we still haven't introduced the piece of SCSS that we'll be using to solve it!
+
+Remember, the problem was that we declared too few row classes for IE and we couldn't support a grid of infinite rows.
+
+It's worth noting that we will never truly be able to solve this problem, since we can only ever chase the infinite rows.
+
+So let's put this problem in another context.
+
+Imagine that we want a grid of 3 columns but the list of items is paginated and you can only ever show a maximum 100 items at any given time.
+
+In that case we would only need to declare 100/3 = 34 row classes to cover our use case!
+
+We could write all that out in CSS or SCSS manually but I'm pretty lazy and what if we evetually switch to a grid with 4 columns instead?
+
+If that ever happened then we'd have to rewrite our grid classes for IE!
+
+This is where we can harness the power of SCSS functions.
+
+You can re-create many simple mathmatical functions in SCSS, such as the power function or you can even invert colors if desired.
+
+* Show examples from https://sass-lang.com/documentation/at-rules/function" *
+
+SCSS has support for all of the simple operators which should aid the creation of any complex functions you might want.
+
+* Show all operators *
+
+I recommend you take a look at SASS's own documentation to learn more since I will only be showcasing what's needed for my problem today.
+
+Here's the kicker, SCSS also supports loops!
+
+* Looking at style.scss now *
+
+So, using the @for loop implementation of SCSS we can now dynamically create our column and row classes for IE grid support.
+
+Even better, we can throw them into some mixins for less redundancy!
+
+For gimmicks, why don't we also throw some debug lines into the compiler to see exactly what's happening?
+
+Notice that I've also provided defaults for a grid of 3 columns by 3 rows, for our first use case.
+
+Now we can include these mixins into our grid-cols-mixin to make it abstractly handle IE support.
+
+And we're done!
+
+We've now created a way to quickly build IE supported grid CSS.
+
+With our current SCSS, let's take a look at a list of 100 items.
+
+* show functions_100 *
+
+Not so pretty, let's adjust our grid!
+
+* set .grid-3-col's grid-cols-mixin to (1fr 1fr 1fr, 3, 34) *
+
+Compiling this and refreshing the screen yields:
+
+* show the pretty grid in IE *
+
+Easy enough!
+
+With this, we should be perfectly able to handle paginated grids in IE without any problem.
+
+=======================================================================================
+
+
+
+=======================================================================================
+Bottom Line
+=======================================================================================
+
+So here's the gist of SCSS/SASS:
+
+It should not be considered to be a silver bullet for stylesheets, but it certainly does make the creation of stylesheets far easier.
+
+On top of that, rapid style changes can be made if proper structure is maintained and maintainance should be a breeze.
+
+Issues that might have once plagued developers can now be easily sidestepped using it's core features.
+
+Take your time, understand what it is that you're trying to do and SCSS will enable it to happen, good luck!
+
+=======================================================================================

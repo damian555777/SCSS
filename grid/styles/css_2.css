@@ -1,0 +1,7 @@
+.grid-container {
+	display: grid;
+	grid-template-columns: 1fr 1fr 1fr;
+	/* IE grid support */
+	display: -ms-grid;
+	-ms-grid-columns: 1fr 1fr 1fr; /* cannot utilize the repeat function */
+}
